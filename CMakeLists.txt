@@ -15,6 +15,7 @@ pico_sdk_init()
 
 add_executable(${PROJECT_NAME}
     src/main.c
+    src/dht11_driver.h src/dht11_driver.c
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
