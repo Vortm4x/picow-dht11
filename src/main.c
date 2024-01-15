@@ -4,16 +4,18 @@
 #include <hardware/gpio.h>
 #include <hardware/watchdog.h>
 
+#include <hardware/timer.h>
+
 #include "dht11_driver.h"
 
 int main() 
 {
-    if(watchdog_caused_reboot())
-    {
-        printf("Timeout reached");
-    }
+    // if(watchdog_caused_reboot())
+    // {
+    //     printf("Timeout reached");
+    // }
 
-    watchdog_enable(1100, true);
+    // watchdog_enable(1100, true);
 
     const uint DHT_PIN = 15;
 
@@ -30,14 +32,13 @@ int main()
     while (true) 
     {
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_HIGH);
-
+        
         dht11_request_data(DHT_PIN);
-        while(!dht11_state.data_received);
+        while(dht11_state.fsm != DHT11_FSM_DATA_CHECKED);
 
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_LOW);
 
-
-        if(dht11_is_valid_data(&dht11_state.sensor_data))
+        if(dht11_state.sensor_data.is_valid)
         {
             printf("HUMIDITY: %d.%d\tTEMP: %d.%d\n",
                 dht11_state.sensor_data.integral_RH,
@@ -51,7 +52,7 @@ int main()
             printf("INVALID DATA!\n");
         }
 
-        watchdog_update();
+        // watchdog_update();
         
         sleep_ms(1000);
     }
