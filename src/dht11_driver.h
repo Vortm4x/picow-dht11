@@ -28,7 +28,8 @@ dht11_data_t;
 
 typedef enum dht11_fsm_state_t
 {
-    DHT11_FSM_START,
+    DHT11_FSM_IDLE,
+    DHT11_FSM_STARTED,
     DHT11_FSM_LOW_REQUEST_SENT,
     DHT11_FSM_HIGH_REQUEST_SENT,
     DHT11_FSM_LOW_RESPONSE_RECEIVED,
@@ -37,6 +38,20 @@ typedef enum dht11_fsm_state_t
     DHT11_FSM_DATA_CHECKED
 }
 dht11_fsm_state_t;
+
+
+typedef enum dht11_fsm_trigger_t
+{
+    DHT11_FSM_TRIGGER_START,
+    DHT11_FSM_TRIGGER_LOW_REQUEST_START,
+    DHT11_FSM_TRIGGER_LOW_REQUEST_END,
+    DHT11_FSM_TRIGGER_HIGH_REQUEST_START,
+    DHT11_FSM_TRIGGER_HIGH_REQUEST_END,
+    DHT11_FSM_TRIGGER_EDGE_FALL,
+    DHT11_FSM_TRIGGER_EDGE_RISE,
+    DHT11_FSM_TRIGGER_STOP,
+}
+dht11_fsm_trigger_t;
 
 typedef struct dht11_state_t
 {
@@ -56,14 +71,16 @@ int64_t dht11_low_request_alarm_callback(alarm_id_t id, void *user_data);
 int64_t dht11_high_request_alarm_callback(alarm_id_t id, void *user_data);
 void dht11_irq_callback(uint gpio, uint32_t event_mask);
 
-void dht11_sfm_send_low_request();
-void dht11_sfm_send_high_request();
-void dht11_sfm_receive_low_response();
-void dht11_sfm_receive_high_response();
-void dht11_sfm_receive_bit_value();
-void dht11_sfm_check_data();
+void dht11_sfm_start(dht11_fsm_trigger_t trigger);
+void dht11_sfm_send_low_request(dht11_fsm_trigger_t trigger);
+void dht11_sfm_send_high_request(dht11_fsm_trigger_t trigger);
+void dht11_sfm_receive_low_response(dht11_fsm_trigger_t trigger);
+void dht11_sfm_receive_high_response(dht11_fsm_trigger_t trigger);
+void dht11_sfm_receive_bit_value(dht11_fsm_trigger_t trigger);
+void dht11_sfm_check_data(dht11_fsm_trigger_t trigger);
+void dht11_sfm_stop(dht11_fsm_trigger_t trigger);
 
-void dht11_sfm_routine();
+void dht11_sfm_routine(dht11_fsm_trigger_t trigger);
 void dht11_request_data(const uint dht_pin);
 
 

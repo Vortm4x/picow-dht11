@@ -10,12 +10,12 @@
 
 int main() 
 {
-    // if(watchdog_caused_reboot())
-    // {
-    //     printf("Timeout reached");
-    // }
+    if(watchdog_caused_reboot())
+    {
+        printf("Timeout reached");
+    }
 
-    // watchdog_enable(1100, true);
+    watchdog_enable(1100, true);
 
     const uint DHT_PIN = 15;
 
@@ -32,9 +32,9 @@ int main()
     while (true) 
     {
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_HIGH);
-        
+
         dht11_request_data(DHT_PIN);
-        while(dht11_state.fsm != DHT11_FSM_DATA_CHECKED);
+        while(dht11_state.fsm != DHT11_FSM_IDLE);
 
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_LOW);
 
@@ -52,7 +52,7 @@ int main()
             printf("INVALID DATA!\n");
         }
 
-        // watchdog_update();
+        watchdog_update();
         
         sleep_ms(1000);
     }
