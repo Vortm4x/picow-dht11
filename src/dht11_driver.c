@@ -182,6 +182,11 @@ void dht11_sfm_stop(dht11_fsm_trigger_t trigger)
             false
         );
 
+        if(dht11_state.fsm == DHT11_FSM_DATA_CHECKED)
+        {
+            xTaskResumeFromISR(dht11_state.callback_task);
+        }
+
         dht11_state.last_signal_time = 0;
         dht11_state.fsm = DHT11_FSM_IDLE;
     }
@@ -221,8 +226,10 @@ void dht11_sfm_routine(dht11_fsm_trigger_t trigger)
     }
 }
 
-void dht11_request_data(const uint dht_pin)
+void dht11_request_data(const uint dht_pin, TaskHandle_t callback_task)
 {
     dht11_state.dht_pin = dht_pin;
+    dht11_state.callback_task = callback_task;
+    
     dht11_sfm_routine(DHT11_FSM_TRIGGER_START);
 }

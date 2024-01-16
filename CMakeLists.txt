@@ -3,15 +3,17 @@ cmake_minimum_required(VERSION 3.13)
 set(PICO_BOARD pico_w)
 include(pico_sdk_import.cmake)
 
-project(pico-dht11-driver C CXX ASM)
+project(pico-freertos C CXX ASM)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 include(lwip_import.cmake)
+SET(FREERTOS_CONFIG_FILE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/configs/FreeRTOS-Kernel")
 
 pico_sdk_init()
 
+include(FreeRTOS_Kernel_import.cmake)
 
 add_executable(${PROJECT_NAME}
     src/main.c
@@ -25,7 +27,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
     pico_stdlib
     pico_cyw43_arch_none
+    FreeRTOS-Kernel
+    FreeRTOS-Kernel-Heap4
     LWIP_PORT
+    FREERTOS_PORT
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall)

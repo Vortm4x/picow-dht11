@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <FreeRTOS.h> 
+#include <task.h>
 #include <pico/stdlib.h>
 #include <hardware/timer.h>
 
@@ -60,6 +62,7 @@ typedef struct dht11_state_t
     uint64_t last_signal_time;
     dht11_fsm_state_t fsm;
     uint dht_pin;
+    TaskHandle_t callback_task;
 }
 dht11_state_t;
 extern dht11_state_t dht11_state;
@@ -81,7 +84,7 @@ void dht11_sfm_check_data(dht11_fsm_trigger_t trigger);
 void dht11_sfm_stop(dht11_fsm_trigger_t trigger);
 
 void dht11_sfm_routine(dht11_fsm_trigger_t trigger);
-void dht11_request_data(const uint dht_pin);
+void dht11_request_data(const uint dht_pin, TaskHandle_t callback_task);
 
 
 #endif //DHT11_DRIVER_H
