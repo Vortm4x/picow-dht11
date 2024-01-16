@@ -10,6 +10,7 @@
 
 #define DHT11_PIN 15
 #define DHT11_DELAY_MS 1000
+#define DHT11_WATCHDOG_ADDITIONAL_DELAY_MS 10 
 
 
 TaskHandle_t print_sensor_data_task = NULL;
@@ -29,6 +30,7 @@ void request_sensor_data(void *paramster)
         dht11_request_data(DHT11_PIN, print_sensor_data_task);
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_LOW);
 
+        watchdog_update();
         vTaskDelay(delay);
     }
 }
@@ -79,6 +81,11 @@ bool init_all()
 
 int main() 
 {
+    if(watchdog_caused_reboot())
+    {
+        printf("Timeout reached");
+    }
+
     if(!init_all()) 
     {
         return -1;
@@ -102,7 +109,8 @@ int main()
         &print_sensor_data_task
     );
 
-    vTaskStartScheduler();    
-
+    watchdog_enable(DHT11_DELAY_MS + DHT11_WATCHDOG_ADDITIONAL_DELAY_MS, true);
+    vTaskStartScheduler();   
+ 
     return 0;
 }
